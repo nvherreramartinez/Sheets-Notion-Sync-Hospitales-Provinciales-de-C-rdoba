@@ -443,81 +443,81 @@ function instalarTriggers() {
 // LIMPIEZA TOTAL DE NOTION (usar una sola vez)
 // =============================================
 function limpiarNotion() {
-const t0 = new Date();
-let cursor = undefined;
-let totalArchivados = 0;
-let totalErrores = 0;
-do {
-const body = { page_size: 100 };
-if (cursor) body.start_cursor = cursor;
-const res = UrlFetchApp.fetch(
-"https://api.notion.com/v1/databases/" + DB_ID_UNICA + "/query",
-{
-method: "post",
-headers: getHeaders(),
-payload: JSON.stringify(body),
-muteHttpExceptions: true
-}
-);
-const data = JSON.parse(res.getContentText());
-const paginas = (data.results || []).filter(p => !p.archived);
-if (paginas.length === 0) {
-cursor = data.has_more ? data.next_cursor : undefined;
-continue;
-}
-// Mandamos de a 20 con retry por 429
-for (let i = 0; i < paginas.length; i += 20) {
-const lote = paginas.slice(i, i + 20);
-let intentos = 0;
-let exito = false;
-while (!exito && intentos < MAX_RETRIES) {
-const requests = lote.map(p => ({
-url: "https://api.notion.com/v1/pages/" + p.id,
-method: "patch",
-headers: getHeaders(),
-payload: JSON.stringify({ archived: true }),
-muteHttpExceptions: true
-}));
-const responses = UrlFetchApp.fetchAll(requests);
-const hayRate = responses.some(r => r.getResponseCode() === 429);
-if (hayRate) {
-intentos++;
-Utilities.sleep(BASE_DELAY * Math.pow(2, intentos));
-continue;
-}
-responses.forEach(r => {
-if (r.getResponseCode() >= 200 && r.getResponseCode() < 300) {
-totalArchivados++;
-} else {
-totalErrores++;
-}
-});
-exito = true;
-}
-Utilities.sleep(300);
-}
-cursor = data.has_more ? data.next_cursor : undefined;
-Logger.log(`📦 ${totalArchivados} archivados hasta ahora...`);
-} while (cursor);
-const duracion = ((new Date() - t0) / 1000).toFixed(1);
-logSync("system", "-", "limpiar-notion", "OK",
-`archivados:${totalArchivados} errores:${totalErrores} tiempo:${duracion}s`
-);
-Logger.log(`✅ Limpieza completa: ${totalArchivados} archivadas en ${duracion}s`);
+  const t0 = new Date();
+  let cursor = undefined;
+  let totalArchivados = 0;
+  let totalErrores = 0;
+  do {
+    const body = { page_size: 100 };
+    if (cursor) body.start_cursor = cursor;
+    const res = UrlFetchApp.fetch(
+      "https://api.notion.com/v1/databases/" + DB_ID_UNICA + "/query",
+      {
+        method: "post",
+        headers: getHeaders(),
+        payload: JSON.stringify(body),
+        muteHttpExceptions: true
+      }
+    );
+    const data = JSON.parse(res.getContentText());
+    const paginas = (data.results || []).filter(p => !p.archived);
+    if (paginas.length === 0) {
+      cursor = data.has_more ? data.next_cursor : undefined;
+      continue;
+    }
+    // Mandamos de a 20 con retry por 429
+    for (let i = 0; i < paginas.length; i += 20) {
+      const lote = paginas.slice(i, i + 20);
+      let intentos = 0;
+      let exito = false;
+      while (!exito && intentos < MAX_RETRIES) {
+        const requests = lote.map(p => ({
+          url: "https://api.notion.com/v1/pages/" + p.id,
+          method: "patch",
+          headers: getHeaders(),
+          payload: JSON.stringify({ archived: true }),
+          muteHttpExceptions: true
+        }));
+        const responses = UrlFetchApp.fetchAll(requests);
+        const hayRate = responses.some(r => r.getResponseCode() === 429);
+        if (hayRate) {
+          intentos++;
+          Utilities.sleep(BASE_DELAY * Math.pow(2, intentos));
+          continue;
+        }
+        responses.forEach(r => {
+          if (r.getResponseCode() >= 200 && r.getResponseCode() < 300) {
+            totalArchivados++;
+          } else {
+            totalErrores++;
+          }
+        });
+        exito = true;
+      }
+      Utilities.sleep(300);
+    }
+    cursor = data.has_more ? data.next_cursor : undefined;
+    Logger.log(`📦 ${totalArchivados} archivados hasta ahora...`);
+  } while (cursor);
+  const duracion = ((new Date() - t0) / 1000).toFixed(1);
+  logSync("system", "-", "limpiar-notion", "OK",
+    `archivados:${totalArchivados} errores:${totalErrores} tiempo:${duracion}s`
+  );
+  Logger.log(`✅ Limpieza completa: ${totalArchivados} archivadas en ${duracion}s`);
 }
 // =============================================
 // LOG DIAGNOSTICO
 // =============================================
 function diagnosticarNotion() {
-const res = UrlFetchApp.fetch(
-"https://api.notion.com/v1/databases/" + DB_ID_UNICA + "/query",
-{
-method: "post",
-headers: getHeaders(),
-payload: JSON.stringify({ page_size: 10 }),
-muteHttpExceptions: true
-}
-);
-Logger.log(res.getResponseCode());
-Logger.log(res.getContentText());
+  const res = UrlFetchApp.fetch(
+    "https://api.notion.com/v1/databases/" + DB_ID_UNICA + "/query",
+    {
+      method: "post",
+      headers: getHeaders(),
+      payload: JSON.stringify({ page_size: 10 }),
+      muteHttpExceptions: true
+    }
+  );
+  Logger.log(res.getResponseCode());
+  Logger.log(res.getContentText());
 }
