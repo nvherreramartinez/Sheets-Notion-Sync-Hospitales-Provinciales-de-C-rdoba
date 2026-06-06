@@ -3,12 +3,9 @@
 // =============================================
 const NOTION_TOKEN = "tu_token_aqui";
 const DB_ID_UNICA = "id_de_tu_base_de_datos";
-
 const BATCH_SIZE = 20;
 const MAX_RETRIES = 5;
 const BASE_DELAY = 300;
-const MAX_RPS = 3;
-
 const MAPEO_HOSPITALES = {
   // --- CAPITAL ---
   "Hospital Córdoba": "Capital",
@@ -53,7 +50,109 @@ const MAPEO_HOSPITALES = {
   "Hospital San Vicente de Paul (Villa del Rosario)": "Interior",
   "Hospital Zonal (Oliva)": "Interior"
 };
-
+// =============================================
+// MAPEO EDAD (SOURCE OF TRUTH)
+// =============================================
+const MAPEO_EDAD = {
+  "Adolescencia": "Adolescente",
+  "Alergia e Inmunología": "Adulto",
+  "Alergia e Inmunología Pediátrica": "Pediátrico",
+  "Anestesiología": "Todas las edades",
+  "Cardiología": "Adulto",
+  "Cardiología Pediátrica": "Pediátrico",
+  "Cardiología Pediátrica|Cardiología Neonatal": "Neonatal",
+  "Centro de Adicciones": "Adulto",
+  "Cirugía": "Adulto",
+  "Cirugía Cabeza y Cuello": "Adulto",
+  "Cirugía Cabeza y Cuello Pediátrica": "Pediátrico",
+  "Cirugía CardioVascular": "Adulto",
+  "Cirugía CardioVascular Pediátrica": "Pediátrico",
+  "Cirugía Maxilofacial": "Adulto",
+  "Cirugía Pediátrica": "Pediátrico",
+  "Cirugía Plástica": "Adulto",
+  "Cirugía Plástica Pediátrica": "Pediátrico",
+  "Cirugía Torácica": "Adulto",
+  "Cirugía Torácica Pediátrica": "Pediátrico",
+  "Clínica Médica": "Adulto",
+  "Dermatología": "Adulto",
+  "Dermatología Pediátrica": "Pediátrico",
+  "Diabetología": "Adulto",
+  "Diabetología Pediátrica": "Pediátrico",
+  "Diagnóstico por Imágenes": "Todas las edades",
+  "Discapacidad, Rehabilitación e Inclusión": "Todas las edades",
+  "Endocrinología": "Adulto",
+  "Endocrinología Pediátrica": "Pediátrico",
+  "Fisioterapia y Kinesiología": "Adulto",
+  "Fisioterapia y Kinesiología Pediátrica": "Pediátrico",
+  "Fisioterapia y Kinesiología Pediátrica|Fisioterapia y Kinesiología Neonatal": "Neonatal",
+  "Fonoaudiología": "Adulto",
+  "Fonoaudiología Pediátrica": "Pediátrico",
+  "Fonoaudiología Pediátrica|Fonoaudiología Neonatal": "Neonatal",
+  "Gastroenterología": "Adulto",
+  "Gastroenterología Pediátrica": "Pediátrico",
+  "Genética": "Todas las edades",
+  "Geriatría": "Adulto",
+  "Ginecología": "Adulto",
+  "Hematología y Oncohematología": "Adulto",
+  "Hematología y Oncohematología Pediátrica": "Pediátrico",
+  "Hemodinamia": "Todas las edades",
+  "Hemoterapia": "Todas las edades",
+  "Hepatología": "Adulto",
+  "Infectología": "Adulto",
+  "Infectología Pediátrica": "Pediátrico",
+  "Infectología Pediátrica|Infectología Neonatal": "Neonatal",
+  "Junta de Discapacidad": "Todas las edades",
+  "Laboratorio": "Todas las edades",
+  "Medicina Familiar": "Todas las edades",
+  "Medicina Legal y Laboral": "Adulto",
+  "Medicina Nuclear": "Todas las edades",
+  "Medicina Paliativa": "Todas las edades",
+  "Medicina Preventiva": "Todas las edades",
+  "Nefrología": "Adulto",
+  "Nefrología Pediátrica": "Pediátrico",
+  "Neonatología": "Neonatal",
+  "Neumonología": "Adulto",
+  "Neumonología Pediátrica": "Pediátrico",
+  "Neurocirugía": "Adulto",
+  "Neurocirugía Pediátrica": "Pediátrico",
+  "Neurología": "Adulto",
+  "Neurología Pediátrica": "Pediátrico",
+  "Neurología Pediátrica|Neurología Neonatal": "Neonatal",
+  "Nutrición": "Adulto",
+  "Nutrición Pediátrica": "Pediátrico",
+  "Obstetricia": "Adulto",
+  "Odontología": "Adulto",
+  "Odontología Pediátrica": "Pediátrico",
+  "Oftalmología": "Adulto",
+  "Oftalmología Pediátrica": "Pediátrico",
+  "Oftalmología Pediátrica|Oftalmología Neonatal": "Neonatal",
+  "Oncología": "Adulto",
+  "Oncología Pediátrica": "Pediátrico",
+  "Otorrinolaringología": "Adulto",
+  "Otorrinolaringología Pediátrica": "Pediátrico",
+  "Otorrinolaringología Pediátrica|Otorrinolaringología Neonatal": "Neonatal",
+  "Pediatría": "Pediátrico",
+  "Podología": "Adulto",
+  "Quemados": "Adulto",
+  "Quemados en Pediatría": "Pediátrico",
+  "Reumatología": "Adulto",
+  "Reumatología Pediátrica": "Pediátrico",
+  "Salud Mental": "Todas las edades",
+  "Salud Rural": "Todas las edades",
+  "Salud Sexual y Reproductiva": "Adulto",
+  "Servicio Social": "Todas las edades",
+  "Terapia del Dolor": "Todas las edades",
+  "Terapia Radiante": "Adulto",
+  "Terapia Radiante Pediátrica": "Pediátrico",
+  "Toxicología": "Adulto",
+  "Toxicología Pediátrica": "Pediátrico",
+  "Traumatología": "Adulto",
+  "Traumatología Pediátrica": "Pediátrico",
+  "Urología": "Adulto",
+  "Urología Pediátrica": "Pediátrico",
+  "Vascular Periférico": "Adulto",
+  "Vascular Periférico Pediátrico": "Pediátrico"
+};
 // =============================================
 // LOGGER UNIFICADO
 // =============================================
@@ -108,9 +207,29 @@ function sanitizarSelect(valor) {
   return String(valor).replace(/,/g, " /");
 }
 // =============================================
+// normalizar text e inf edad
+// =============================================
+function normalizarTexto(t) {
+  return String(t || "").trim();
+}
+
+function inferirEdad(servicio, seccion) {
+  const s = normalizarTexto(servicio);
+  const sec = normalizarTexto(seccion);
+
+  const keyFull = `${s}|${sec}`;
+
+  if (MAPEO_EDAD[keyFull]) return MAPEO_EDAD[keyFull];
+  if (MAPEO_EDAD[s]) return MAPEO_EDAD[s];
+
+  return "Adulto"; // fallback seguro
+}
+// =============================================
 // BUILD PROPERTIES
 // =============================================
 function buildProperties(centro, servicio, seccion, aplicaciones, zona, id) {
+  const edad = inferirEdad(servicio, seccion);
+
   return {
     "Consulta": {
       title: [{ text: { content: aplicaciones + " - " + servicio } }]
@@ -121,6 +240,7 @@ function buildProperties(centro, servicio, seccion, aplicaciones, zona, id) {
     "Centro": { select: { name: sanitizarSelect(centro) } },
     "Servicio": { select: { name: sanitizarSelect(servicio) } },
     "Sección": { select: { name: sanitizarSelect(seccion) } },
+    "Edad": { select: { name: edad } }, // 👈 NUEVO
     "Aplicaciones": {
       rich_text: [{ text: { content: String(aplicaciones) } }]
     },
@@ -437,87 +557,4 @@ function instalarTriggers() {
     .create();
 
   Logger.log("✅ Triggers instalados: onEditFuente + checkPendingSync");
-}
-// UTILIDADES DE EMERGENCIA
-// =============================================
-// LIMPIEZA TOTAL DE NOTION (usar una sola vez)
-// =============================================
-function limpiarNotion() {
-  const t0 = new Date();
-  let cursor = undefined;
-  let totalArchivados = 0;
-  let totalErrores = 0;
-  do {
-    const body = { page_size: 100 };
-    if (cursor) body.start_cursor = cursor;
-    const res = UrlFetchApp.fetch(
-      "https://api.notion.com/v1/databases/" + DB_ID_UNICA + "/query",
-      {
-        method: "post",
-        headers: getHeaders(),
-        payload: JSON.stringify(body),
-        muteHttpExceptions: true
-      }
-    );
-    const data = JSON.parse(res.getContentText());
-    const paginas = (data.results || []).filter(p => !p.archived);
-    if (paginas.length === 0) {
-      cursor = data.has_more ? data.next_cursor : undefined;
-      continue;
-    }
-    // Mandamos de a 20 con retry por 429
-    for (let i = 0; i < paginas.length; i += 20) {
-      const lote = paginas.slice(i, i + 20);
-      let intentos = 0;
-      let exito = false;
-      while (!exito && intentos < MAX_RETRIES) {
-        const requests = lote.map(p => ({
-          url: "https://api.notion.com/v1/pages/" + p.id,
-          method: "patch",
-          headers: getHeaders(),
-          payload: JSON.stringify({ archived: true }),
-          muteHttpExceptions: true
-        }));
-        const responses = UrlFetchApp.fetchAll(requests);
-        const hayRate = responses.some(r => r.getResponseCode() === 429);
-        if (hayRate) {
-          intentos++;
-          Utilities.sleep(BASE_DELAY * Math.pow(2, intentos));
-          continue;
-        }
-        responses.forEach(r => {
-          if (r.getResponseCode() >= 200 && r.getResponseCode() < 300) {
-            totalArchivados++;
-          } else {
-            totalErrores++;
-          }
-        });
-        exito = true;
-      }
-      Utilities.sleep(300);
-    }
-    cursor = data.has_more ? data.next_cursor : undefined;
-    Logger.log(`📦 ${totalArchivados} archivados hasta ahora...`);
-  } while (cursor);
-  const duracion = ((new Date() - t0) / 1000).toFixed(1);
-  logSync("system", "-", "limpiar-notion", "OK",
-    `archivados:${totalArchivados} errores:${totalErrores} tiempo:${duracion}s`
-  );
-  Logger.log(`✅ Limpieza completa: ${totalArchivados} archivadas en ${duracion}s`);
-}
-// =============================================
-// LOG DIAGNOSTICO
-// =============================================
-function diagnosticarNotion() {
-  const res = UrlFetchApp.fetch(
-    "https://api.notion.com/v1/databases/" + DB_ID_UNICA + "/query",
-    {
-      method: "post",
-      headers: getHeaders(),
-      payload: JSON.stringify({ page_size: 10 }),
-      muteHttpExceptions: true
-    }
-  );
-  Logger.log(res.getResponseCode());
-  Logger.log(res.getContentText());
 }
